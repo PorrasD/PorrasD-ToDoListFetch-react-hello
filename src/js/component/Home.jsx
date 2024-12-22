@@ -1,13 +1,12 @@
 import React from 'react';
-import ToDoList from './components/ToDoList.jsx';
-import { Container } from 'react-bootstrap';
+import To_DoList from './To_DoList.jsx';
 
 const Home = () => {
     return (
-        <Container className="mt-5">
+        <div className="Container mt-5">
             <h1 className="text-center">Lista de Tareas</h1>
-            <ToDoList />
-        </Container>
+            <To_DoList />
+        </div>
     );
 };
 
