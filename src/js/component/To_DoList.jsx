@@ -39,20 +39,25 @@ const To_DoList = () => {
         const updatedTasks = tasks_list.filter((_, item) => item !== index);
         setTasks(updatedTasks);
     };
+
     const deleteAllTasks = async () => {
         try {
-            const response = await fetch(`https://playground.4geeks.com/todo/todos/${tasks_list}`, {
-                method: "DELETE",
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-            if (!response.ok) {
-                throw new Error("Error");
-            }
-            setTasks([]);
+            await Promise.all(
+                tasks_list.map(async (task) => {
+                    const response = await fetch(`https://playground.4geeks.com/todo/todos/${task.id}`, {
+                        method: "DELETE",
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    if (!response.ok) {
+                        throw new Error(`Error al borrar tarea con ID: ${task.id}`);
+                    }
+                })
+            );
+            setTasks([]); // Vaciar la lista local después de eliminar todas las tareas
         } catch (error) {
-            console.error(error);
+            console.error("Error al borrar todas las tareas:", error);
         }
     };
 
@@ -95,18 +100,21 @@ const To_DoList = () => {
 
     return (
         <div>
-            <input type="text" id="user" placeholder="Add your username" onChange={(e) => setUserName(e.target.value)} />
-            <button className="boton" onClick={handlerSearch}>Buscar</button>
-            <input type="text" onChange={(e) => setTask(e.target.value)}
-                value={task}
-                onKeyDown={addTask}
-                className='list-group-item-success'></input>
-                            <button
-                className="btn btn-danger mt-3"
-                onClick={deleteAllTasks}
-            >
-                Delete All
-            </button>
+            <div class="input-group mb-3">
+                <button class="btn btn-outline-secondary" type="button" className="boton" onClick={handlerSearch}>Search</button>
+                <input type="text" class="form-control" id="user" placeholder="Add your username" onChange={(e) => setUserName(e.target.value)} />
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                <input type="text" onChange={(e) => setTask(e.target.value)}
+                        value={task}
+                        placeholder="Add a new task"
+                        onKeyDown={addTask}
+                        className='form-control justify-content-between align-items-center list-group-item-success'></input>
+                </div>
+            </div>
+
             <ul className="list-group mt-4">
                 {tasks_list.length === 0 ? (
                     <li className="list-group-item text-center text-muted">No tasks, add your task here!</li>
@@ -137,6 +145,12 @@ const To_DoList = () => {
                 onChange={(e) => setTask(e.target.value)}
                 onKeyDown={addTask}
             />
+            <button
+                        className="btn btn-danger mt-3"
+                        onClick={deleteAllTasks}
+                    >
+                        Delete All
+                    </button>
         </div>
     );
 };
